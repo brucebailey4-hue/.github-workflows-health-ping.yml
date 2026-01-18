@@ -1,0 +1,19 @@
+name: Ping Supabase Health Check
+
+on:
+  schedule:
+    - cron: '*/20 * * * *' # every 20 minutes
+  workflow_dispatch: # allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://kcbybnsbfxrpknmkibjm.supabase.co/functions/v1/health-check")
+          echo "Health endpoint returned $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Health check failed" >&2
+            exit 1
+          fi
